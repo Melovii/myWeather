@@ -1,9 +1,17 @@
 const API_KEYS = {
     WEATHER: 'X3WL6UFP39QRKSNKS4JDBEYWS',
-    NEWS: 'INSERT NEWS API KEY HERE',
-    GIFS: 'INSERT GIF API KEY HERE',
-    UNSPLASH: 'INSERT UNSPLASH API KEY HERE',
+    UNSPLASH: 'zqA-z5iGBDygUhjo35PiiGD32vkEzF4KtSI_xui0AX4',
 };
+
+async function fetchBackgroundImage(condition) {
+    try {
+        const response = await fetch(`https://api.unsplash.com/photos/random?query=${condition}&client_id=${API_KEYS.UNSPLASH}`);
+        const data = await response.json();
+        return data.urls.full;
+    } catch (error) {
+        console.log('Error fetching background image:', error);
+    }
+}
 
 async function fetchWeather(location) {
     try {
@@ -32,7 +40,7 @@ function processWeatherData(data) {
     };
 }
 
-function displayWeatherData(data) {
+async function displayWeatherData(data) {
     const weatherInfoDiv = document.getElementById('weather-info');
     weatherInfoDiv.innerHTML = `
     <h2>${data.address}</h2>
@@ -43,14 +51,31 @@ function displayWeatherData(data) {
     <p>Temperature: ${data.temp}°C</p>
     <p>Sunrise: ${data.sunrise}</p>
     <p>Sunset: ${data.sunset}</p>
-    `;
+  `;
+
+    const backgroundImageURL = await fetchBackgroundImage(data.conditions);
+    if (backgroundImageURL) {
+        document.body.style.backgroundImage = `url(${backgroundImageURL})`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundAttachment = 'fixed';
+        document.body.style.backgroundRepeat = 'no-repeat';
+    }
 }
 
 document.getElementById('location-form').addEventListener('submit', async (event) => {
     event.preventDefault();
     const location = document.getElementById('location-input').value;
 
+    if (!location) {
+        return;
+    }
+
+    const loadingDiv = document.getElementById('loading');
+    loadingDiv.style.display = 'block';
+
     const weatherData = await fetchWeather(location);
+    loadingDiv.style.display = 'none';
     if (weatherData) {
         console.log(weatherData);
         displayWeatherData(weatherData);
