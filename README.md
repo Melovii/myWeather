@@ -1,4 +1,4 @@
-w# myWeather
+# myWeather
 
 ## [Live Demo](https://Melovii.github.io/myWeather/)
 
