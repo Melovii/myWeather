@@ -17,6 +17,7 @@ async function fetchWeather(location) {
     try {
         const response = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}?key=${API_KEYS.WEATHER}`);
         const data = await response.json();
+        console.log(data);
         return processWeatherData(data);
     } catch (error) {
         console.log('Error fetching weather data:', error);
@@ -30,12 +31,12 @@ function processWeatherData(data) {
 
     return {
         conditions: data.currentConditions.conditions,
-        feelslike: data.currentConditions.feelslike,
+        temp: ((data.currentConditions.temp - 32) * (5/9)).toFixed(1),
+        feelslike: ((data.currentConditions.feelslike - 32) * (5/9)).toFixed(1),
         sunrise: data.currentConditions.sunrise,
         sunset: data.currentConditions.sunset,
         humidity: data.currentConditions.humidity,
-        windspeed: data.currentConditions.windspeed,
-        temp: data.currentConditions.temp,
+        windspeed: (data.currentConditions.windspeed * 1.60934).toFixed(1),
         address: data.resolvedAddress,
     };
 }
@@ -45,10 +46,10 @@ async function displayWeatherData(data) {
     weatherInfoDiv.innerHTML = `
     <h2>${data.address}</h2>
     <p>Conditions: ${data.conditions}</p>
+    <p>Temperature: ${data.temp}°C</p>
     <p>Feels like: ${data.feelslike}°C</p>
     <p>Humidity: ${data.humidity}%</p>
     <p>Wind Speed: ${data.windspeed} kmh</p>
-    <p>Temperature: ${data.temp}°C</p>
     <p>Sunrise: ${data.sunrise}</p>
     <p>Sunset: ${data.sunset}</p>
   `;
